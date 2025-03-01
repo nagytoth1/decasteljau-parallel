@@ -44,17 +44,17 @@ namespace _GraphicsDLL
             for (int i = 0; i < numberOfControlPoints; i++)
             {
                 for (int k = 0; k < controlPoints.Length - 1; k++)
-                    g.DrawLineDDA(pointPen, controlPoints[k], controlPoints[k + 1]);
+                    g.DrawLine(pointPen, controlPoints[k], controlPoints[k + 1]);
 
                 for (int j = 0; j < numberOfControlPoints - i - 1; j++)
                 {
-                    g.DrawPoint(pointPen, pointBrush, controlPoints[j], 5f); 
-                    g.DrawPoint(pointPen, pointBrush, controlPoints[numberOfControlPoints-i-1], 5f);
+                    //g.DrawPoint(pointPen, pointBrush, controlPoints[j], 5f); 
+                    //g.DrawPoint(pointPen, pointBrush, controlPoints[numberOfControlPoints-i-1], 5f);
                     controlPoints[j] = controlPoints[j].Lerp(controlPoints[j + 1], distance);
                 }
             }
-            pointBrush.Color = Color.Red;
-            g.DrawPoint(pointPen, pointBrush, controlPoints[0], 5f);
+            //pointBrush.Color = Color.Red;
+            //g.DrawPoint(pointPen, pointBrush, controlPoints[0], 5f);
         }
 
         public static void DeCasteljauParallel(Graphics g, PointF[] controlPoints, float distance = .5f)
@@ -65,7 +65,7 @@ namespace _GraphicsDLL
             {
                 // Directly draw lines (safe since it's single-threaded)
                 for (int k = 0; k < controlPoints.Length - 1; k++)
-                    g.DrawLineDDA(pointPen, controlPoints[k], controlPoints[k + 1]);
+                    g.DrawLine(pointPen, controlPoints[k], controlPoints[k + 1]);
 
                 int elementsToProcess = numberOfControlPoints - i - 1;
                 if (elementsToProcess <= 0) break; // No more processing needed
@@ -78,19 +78,9 @@ namespace _GraphicsDLL
                     newControlPoints[j] = controlPoints[j].Lerp(controlPoints[j + 1], distance);
                 });
 
-                // Draw all points after parallel computations (no locking required)
-                for (int j = 0; j < elementsToProcess; j++)
-                {
-                    g.DrawPoint(pointPen, pointBrush, newControlPoints[j], 5f);
-                }
-
                 // Update controlPoints for the next iteration
                 Array.Copy(newControlPoints, controlPoints, elementsToProcess);
             }
-
-            // Final point in red (single-threaded, no locking needed)
-            pointBrush.Color = Color.Red;
-            g.DrawPoint(pointPen, pointBrush, controlPoints[0], 5f);
         }
 
         public static void CallDeCasteljauRecursive(Graphics g, PointF[] controlPoints, float distance = .5f)
@@ -107,14 +97,14 @@ namespace _GraphicsDLL
             PointF[] newPoints = new PointF[controlPoints.Length - 1];
             
             for (int k = 0; k < controlPoints.Length - 1; k++)
-                g.DrawLineDDA(pointPen, controlPoints[k], controlPoints[k + 1]);
+                g.DrawLine(pointPen, controlPoints[k], controlPoints[k + 1]);
             int i;
             for (i = 0; i < controlPoints.Length-1; i++)
             {
-                g.DrawPoint(pointPen, pointBrush, controlPoints[i], 5f);
+                //g.DrawPoint(pointPen, pointBrush, controlPoints[i], 5f);
                 newPoints[i] = controlPoints[i].Lerp(controlPoints[i + 1], distance);
             }
-            g.DrawPoint(pointPen, pointBrush, controlPoints[i], 5f); //draw the last point
+            //g.DrawPoint(pointPen, pointBrush, controlPoints[i], 5f); //draw the last point
             return DeCasteljauRecursive(g, newPoints, distance);
         }
 
@@ -141,7 +131,6 @@ namespace _GraphicsDLL
             int newSize = size - 1;
             PointF[] newPoints = new PointF[newSize];
 
-            // 🖌 Parallelized Line Drawing with Locking for Thread Safety
             Parallel.For(0, size - 1, i =>
             {
                 lock (drawLock) // Ensure only one thread modifies g at a time
@@ -150,13 +139,11 @@ namespace _GraphicsDLL
                 }
             });
 
-            // ⚡ Parallel Lerp Computation (Thread-Safe, No Lock Needed)
             Parallel.For(0, newSize, i =>
             {
                 newPoints[i] = controlPoints[i].Lerp(controlPoints[i + 1], distance);
             });
 
-            // 🚀 Parallel Recursive Execution (Limits Thread Overhead)
             PointF[] result;
             if (newSize > 16) // Prevent excessive threading for small cases
             {
