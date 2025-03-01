@@ -35,9 +35,9 @@ namespace _GraphicsDLL
             return Math.Pow(t, 3);
         }
 
-        private static Random rnd = new Random();
         private static SolidBrush pointBrush = new SolidBrush(Color.Salmon);
         private static Pen pointPen = new Pen(Color.Black, 2f);
+
         public static void DeCasteljau(Graphics g, PointF[] controlPoints, float distance = .5f)
         {
             int numberOfControlPoints = controlPoints.Length;
@@ -45,40 +45,40 @@ namespace _GraphicsDLL
             {
                 for (int k = 0; k < controlPoints.Length - 1; k++)
                     g.DrawLine(pointPen, controlPoints[k], controlPoints[k + 1]);
-
                 for (int j = 0; j < numberOfControlPoints - i - 1; j++)
                 {
-                    //g.DrawPoint(pointPen, pointBrush, controlPoints[j], 5f); 
-                    //g.DrawPoint(pointPen, pointBrush, controlPoints[numberOfControlPoints-i-1], 5f);
+                    g.DrawPoint(pointPen, pointBrush, controlPoints[j], 5f); 
+                    g.DrawPoint(pointPen, pointBrush, controlPoints[numberOfControlPoints-i-1], 5f);
                     controlPoints[j] = controlPoints[j].Lerp(controlPoints[j + 1], distance);
                 }
             }
-            //pointBrush.Color = Color.Red;
-            //g.DrawPoint(pointPen, pointBrush, controlPoints[0], 5f);
+            pointBrush.Color = Color.Red;
+            g.DrawPoint(pointPen, pointBrush, controlPoints[0], 5f);
         }
+
 
         public static void DeCasteljauParallel(Graphics g, PointF[] controlPoints, float distance = .5f)
         {
-            int numberOfControlPoints = controlPoints.Length;
-
+            byte numberOfControlPoints = (byte) controlPoints.Length;
+            const byte NUM_OF_THREADS = 4;
             for (int i = 0; i < numberOfControlPoints; i++)
             {
-                // Directly draw lines (safe since it's single-threaded)
+                
                 for (int k = 0; k < controlPoints.Length - 1; k++)
                     g.DrawLine(pointPen, controlPoints[k], controlPoints[k + 1]);
 
                 int elementsToProcess = numberOfControlPoints - i - 1;
-                if (elementsToProcess <= 0) break; // No more processing needed
+                if (elementsToProcess <= 0) break; 
 
-                PointF[] newControlPoints = new PointF[elementsToProcess]; // Buffer to store computed points
+                PointF[] newControlPoints = new PointF[elementsToProcess]; 
 
-                // Parallel computation (no locking needed)
-                Parallel.For(0, elementsToProcess, new ParallelOptions { MaxDegreeOfParallelism = 4 }, j =>
+                
+                Parallel.For(0, elementsToProcess, new ParallelOptions { MaxDegreeOfParallelism = NUM_OF_THREADS }, j =>
                 {
                     newControlPoints[j] = controlPoints[j].Lerp(controlPoints[j + 1], distance);
                 });
 
-                // Update controlPoints for the next iteration
+                
                 Array.Copy(newControlPoints, controlPoints, elementsToProcess);
             }
         }
@@ -91,7 +91,7 @@ namespace _GraphicsDLL
 
         private static PointF[] DeCasteljauRecursive(Graphics g, PointF[] controlPoints, float distance = .5f)
         {
-            if (controlPoints.Length == 1) //base condition
+            if (controlPoints.Length == 1) 
                 return controlPoints;
 
             PointF[] newPoints = new PointF[controlPoints.Length - 1];
@@ -101,21 +101,21 @@ namespace _GraphicsDLL
             int i;
             for (i = 0; i < controlPoints.Length-1; i++)
             {
-                //g.DrawPoint(pointPen, pointBrush, controlPoints[i], 5f);
+                
                 newPoints[i] = controlPoints[i].Lerp(controlPoints[i + 1], distance);
             }
-            //g.DrawPoint(pointPen, pointBrush, controlPoints[i], 5f); //draw the last point
+            
             return DeCasteljauRecursive(g, newPoints, distance);
         }
 
 
-        private static readonly object drawLock = new object(); // Lock object for thread-safe drawing
+        private static readonly object drawLock = new object(); 
 
         public static void CallDeCasteljauRecursiveParallel(Graphics g, PointF[] controlPoints, float distance = .5f)
         {
             PointF[] result = DeCasteljauRecursiveParallel(g, controlPoints, distance);
 
-            // Draw the final point in red (with thread safety)
+            
             lock (drawLock)
             {
                 g.DrawPoint(new Pen(Color.Black, 2f), Brushes.Red, result[0], 5f);
@@ -125,7 +125,7 @@ namespace _GraphicsDLL
         private static PointF[] DeCasteljauRecursiveParallel(Graphics g, PointF[] controlPoints, float distance = .5f)
         {
             int size = controlPoints.Length;
-            if (size == 1) // Base case: return the last remaining point
+            if (size == 1)
                 return controlPoints;
 
             int newSize = size - 1;
@@ -133,7 +133,7 @@ namespace _GraphicsDLL
 
             Parallel.For(0, size - 1, i =>
             {
-                lock (drawLock) // Ensure only one thread modifies g at a time
+                lock (drawLock) 
                 {
                     g.DrawLine(new Pen(Color.Black, 1.5f), controlPoints[i], controlPoints[i + 1]);
                 }
@@ -145,7 +145,7 @@ namespace _GraphicsDLL
             });
 
             PointF[] result;
-            if (newSize > 16) // Prevent excessive threading for small cases
+            if (newSize > 16) 
             {
                 Task<PointF[]> task = Task.Run(() => DeCasteljauRecursiveParallel(g, newPoints, distance));
                 result = task.Result;

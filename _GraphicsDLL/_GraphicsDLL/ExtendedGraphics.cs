@@ -351,7 +351,6 @@ namespace _GraphicsDLL
                 g.DrawLine(pen, p1, p2);
         }
         #endregion
-        #region Paraméteres görbe - ez lesz az alapja a Hermites meg a Bezier görbéknek
         public static void DrawParametricCurve2D(this Graphics g, Pen pen, 
             Func<float, float> X, Func<float, float> Y,
             float a_limit, float b_limit, float scale = 1.0f, 
@@ -374,31 +373,6 @@ namespace _GraphicsDLL
                 prevPoint = nextPoint;
             }
         }
-        #endregion
-        #region HermiteArc
-        public static void DrawHermiteArc(this Graphics g, Pen pen,
-            PointF p0, PointF p1, PointF t0, PointF t1)
-        {
-            g.DrawHermiteArc(pen, new HermiteArc((Vector2)p0, (Vector2)p1, (Vector2)t0, (Vector2)t1));
-        }
-        public static void DrawHermiteArc(this Graphics g, Pen pen,
-            Vector2 p0, Vector2 p1, Vector2 t0, Vector2 t1)
-        {
-            g.DrawHermiteArc(pen, (PointF)p0, (PointF)p1, (PointF)t0, (PointF) t1); //ez csak 4 oszlopon fog szorzást végezni
-        }
-
-        public static void DrawHermiteArc(this Graphics g, Pen pen,
-            HermiteArc arc)
-        {
-            g.DrawParametricCurve2D(pen, 
-                t => (float) ( arc.H_Calculate(t, 0) * arc.p0.x + arc.H_Calculate(t, 1) * arc.p1.x +
-                               arc.H_Calculate(t, 2) * arc.t0.x + arc.H_Calculate(t, 3) * arc.t1.x),
-                t => (float) ( arc.H_Calculate(t, 0) * arc.p0.y + arc.H_Calculate(t, 1) * arc.p1.y +
-                               arc.H_Calculate(t, 2) * arc.t0.y + arc.H_Calculate(t, 3) * arc.t1.y),
-                0f, 1f);
-        }
-
-        #endregion
         #region BezierCurve
         public static void DrawBezier3(this Graphics g, Pen pen,
             Bezier3Curve curve)

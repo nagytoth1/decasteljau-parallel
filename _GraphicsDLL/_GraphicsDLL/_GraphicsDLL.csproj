@@ -46,14 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extension\Bezier3Curve.cs" />
-    <Compile Include="Extension\ExtendedBitmap.cs" />
-    <Compile Include="Extension\ExtendedColor.cs" />
-    <Compile Include="Extension\ExtendedPointF.cs" />
-    <Compile Include="Extension\ExtendedGraphics.cs" />
-    <Compile Include="Extension\Vector2.cs" />
-    <Compile Include="Hermite.cs" />
+    <Compile Include="Bezier3Curve.cs" />
+    <Compile Include="ExtendedGraphics.cs" />
+    <Compile Include="ExtendedPointF.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vector2.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
