@@ -16,3 +16,9 @@ C:\Users\nagyt\Downloads\DZKBX0_beadandok\_GraphicsDLL\_GraphicsDLL\obj\Debug\_G
 C:\Users\nagyt\Downloads\DZKBX0_beadandok\_GraphicsDLL\_GraphicsDLL\obj\Debug\_GraphicsDLL.csproj.CoreCompileInputs.cache
 C:\Users\nagyt\Downloads\DZKBX0_beadandok\_GraphicsDLL\_GraphicsDLL\obj\Debug\_GraphicsDLL.dll
 C:\Users\nagyt\Downloads\DZKBX0_beadandok\_GraphicsDLL\_GraphicsDLL\obj\Debug\_GraphicsDLL.pdb
+D:\repo\dzkbx0-parhuzamositas-beadando\_GraphicsDLL\_GraphicsDLL\obj\Debug\_GraphicsDLL.csproj.AssemblyReference.cache
+D:\repo\dzkbx0-parhuzamositas-beadando\_GraphicsDLL\_GraphicsDLL\obj\Debug\_GraphicsDLL.csproj.CoreCompileInputs.cache
+D:\repo\dzkbx0-parhuzamositas-beadando\_GraphicsDLL\_GraphicsDLL\bin\Debug\_GraphicsDLL.dll
+D:\repo\dzkbx0-parhuzamositas-beadando\_GraphicsDLL\_GraphicsDLL\bin\Debug\_GraphicsDLL.pdb
+D:\repo\dzkbx0-parhuzamositas-beadando\_GraphicsDLL\_GraphicsDLL\obj\Debug\_GraphicsDLL.dll
+D:\repo\dzkbx0-parhuzamositas-beadando\_GraphicsDLL\_GraphicsDLL\obj\Debug\_GraphicsDLL.pdb

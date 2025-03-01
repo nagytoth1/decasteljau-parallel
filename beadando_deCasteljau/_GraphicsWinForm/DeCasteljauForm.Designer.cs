@@ -39,47 +39,44 @@
             // 
             // canvas
             // 
-            this.canvas.Location = new System.Drawing.Point(25, 33);
+            this.canvas.Location = new System.Drawing.Point(12, 33);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(1150, 650);
+            this.canvas.Size = new System.Drawing.Size(1163, 721);
             this.canvas.TabIndex = 0;
             this.canvas.TabStop = false;
             this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.canvas_Paint);
-            this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.canvas_MouseDown);
-            this.canvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.canvas_MouseMove);
-            this.canvas.MouseUp += new System.Windows.Forms.MouseEventHandler(this.canvas_MouseUp);
             // 
             // rbCasteljauIter
             // 
             this.rbCasteljauIter.AutoSize = true;
             this.rbCasteljauIter.Checked = true;
             this.rbCasteljauIter.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbCasteljauIter.Location = new System.Drawing.Point(95, 8);
-            this.rbCasteljauIter.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbCasteljauIter.Location = new System.Drawing.Point(12, 8);
+            this.rbCasteljauIter.Margin = new System.Windows.Forms.Padding(2);
             this.rbCasteljauIter.Name = "rbCasteljauIter";
-            this.rbCasteljauIter.Size = new System.Drawing.Size(194, 21);
+            this.rbCasteljauIter.Size = new System.Drawing.Size(98, 21);
             this.rbCasteljauIter.TabIndex = 2;
             this.rbCasteljauIter.TabStop = true;
-            this.rbCasteljauIter.Text = "Iterative Decasteljau";
+            this.rbCasteljauIter.Text = "Iterative";
             this.rbCasteljauIter.UseVisualStyleBackColor = true;
             // 
             // rbCasteljauRec
             // 
             this.rbCasteljauRec.AutoSize = true;
             this.rbCasteljauRec.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbCasteljauRec.Location = new System.Drawing.Point(297, 8);
-            this.rbCasteljauRec.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rbCasteljauRec.Location = new System.Drawing.Point(227, 8);
+            this.rbCasteljauRec.Margin = new System.Windows.Forms.Padding(2);
             this.rbCasteljauRec.Name = "rbCasteljauRec";
-            this.rbCasteljauRec.Size = new System.Drawing.Size(194, 21);
+            this.rbCasteljauRec.Size = new System.Drawing.Size(218, 21);
             this.rbCasteljauRec.TabIndex = 2;
-            this.rbCasteljauRec.Text = "Recursive DeCasteljau";
+            this.rbCasteljauRec.Text = "Recursive Multi-threaded";
             this.rbCasteljauRec.UseVisualStyleBackColor = true;
             // 
             // executeBtn
             // 
             this.executeBtn.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.executeBtn.Location = new System.Drawing.Point(1093, 3);
-            this.executeBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.executeBtn.Margin = new System.Windows.Forms.Padding(2);
             this.executeBtn.Name = "executeBtn";
             this.executeBtn.Size = new System.Drawing.Size(80, 25);
             this.executeBtn.TabIndex = 3;
@@ -91,12 +88,12 @@
             // 
             this.rbIterMultiThread.AutoSize = true;
             this.rbIterMultiThread.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rbIterMultiThread.Location = new System.Drawing.Point(495, 8);
+            this.rbIterMultiThread.Location = new System.Drawing.Point(528, 6);
             this.rbIterMultiThread.Margin = new System.Windows.Forms.Padding(2);
             this.rbIterMultiThread.Name = "rbIterMultiThread";
-            this.rbIterMultiThread.Size = new System.Drawing.Size(314, 21);
+            this.rbIterMultiThread.Size = new System.Drawing.Size(218, 21);
             this.rbIterMultiThread.TabIndex = 4;
-            this.rbIterMultiThread.Text = "Iterative Multi-threaded DeCasteljau";
+            this.rbIterMultiThread.Text = "Iterative Multi-threaded";
             this.rbIterMultiThread.UseVisualStyleBackColor = true;
             // 
             // elapsedTimeLbl
