@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using GraphicsDLL;
 
@@ -21,7 +20,16 @@ namespace DeCasteljauForm
             this.stopwatch = new Stopwatch();
             this.controlPoints = new PointF[] {};
             InitializeComponent();
-            elapsedTimeLbl.Text = "Elapsed time: ms";
+            AddAvailableStrategies();
+        }
+
+        private void AddAvailableStrategies()
+        {
+            var availableStrategies = Enum.GetValues(typeof(DeCasteljauStrategies));
+            foreach (var strategy in availableStrategies)
+            {
+                cbDecasteljau.Items.Add(strategy);
+            }
         }
 
         private void canvas_Paint(object sender, PaintEventArgs e)
@@ -33,14 +41,15 @@ namespace DeCasteljauForm
         {
             PointF[] controlPointsCopy = new PointF[controlPoints.Length];
             Array.Copy(controlPoints, controlPointsCopy, controlPoints.Length);
-            DeCasteljauStrategy selectedDecasteljauStrategy = CreateSelectedStrategy(graphics);
+            DeCasteljauStrategies selectedStrategy = (DeCasteljauStrategies) Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
+            DeCasteljauStrategy deCasteljau = StrategyFactory.Create(graphics, selectedStrategy);
             float actualDistance = 0.0f;
             float step = 0.1f;
             while (actualDistance < 1.0f)
             {
                 try
                 {
-                    selectedDecasteljauStrategy.Draw(controlPoints, actualDistance);
+                    deCasteljau.Draw(controlPoints, actualDistance);
                 }
                 catch (Exception exception)
                 {
@@ -49,15 +58,6 @@ namespace DeCasteljauForm
                 }
                 actualDistance += step;
             }
-        }
-
-        private DeCasteljauStrategy CreateSelectedStrategy(Graphics graphics)
-        {
-            if (rbCasteljauRec.Checked)
-                return new RecursiveParallelDeCasteljau(graphics);
-            if (rbIterMultiThread.Checked)
-                return new IterativeParallelDeCasteljau(graphics);
-            return new IterativeSingleThreadedDeCasteljau(graphics);
         }
 
         private void executeBtn_Click(object sender, EventArgs e)

@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphicsDLL", "GraphicsDLL\GraphicsDLL.csproj", "{B20860AC-43FF-4BEF-BD88-A84E411341D4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeCasteljauForm", "DeCasteljauForm\DeCasteljauForm.csproj", "{AAD63873-00A3-4EAD-8A43-452EB9D4C4E7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B20860AC-43FF-4BEF-BD88-A84E411341D4} = {B20860AC-43FF-4BEF-BD88-A84E411341D4}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

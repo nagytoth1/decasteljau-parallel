@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="factory\StrategyFactory.cs" />
     <Compile Include="strategy\DeCasteljauStrategy.cs" />
     <Compile Include="utilities\ExtendedGraphics.cs" />
     <Compile Include="utilities\ExtendedPointF.cs" />
