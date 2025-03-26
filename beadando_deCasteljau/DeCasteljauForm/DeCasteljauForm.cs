@@ -18,7 +18,12 @@ namespace DeCasteljauForm
         public DeCasteljauForm()
         {
             this.stopwatch = new Stopwatch();
-            this.controlPoints = new PointF[] {};
+            this.controlPoints = new PointF[] {
+                new PointF( 100, 300 ),
+                new PointF( 200, 100 ),
+                new PointF( 500, 100 ),
+                new PointF( 600, 300 )
+            };
             InitializeComponent();
             AddAvailableStrategies();
         }
@@ -32,31 +37,51 @@ namespace DeCasteljauForm
             }
         }
 
-        private void canvas_Paint(object sender, PaintEventArgs e)
+        private void OnCanvasPainted(object sender, PaintEventArgs e)
         {
             graphics = canvas.CreateGraphics();
         }
 
-        private void executeSelectedDecasteljauMethod()
+        private void DisplayErrorMessage(string message)
+        {
+            elapsedTimeLbl.ForeColor = Color.White;
+            elapsedTimeLbl.BackColor = Color.DarkRed;
+            elapsedTimeLbl.Text = $"Error: {message}";
+        }
+
+        private void ExecuteSelectedDecasteljau()
+        {
+            if (cbDecasteljau.SelectedItem == null || string.IsNullOrWhiteSpace(cbDecasteljau.SelectedItem.ToString()))
+            {
+                DisplayErrorMessage("Please, select an implementation first!");
+                return;
+            }
+
+            DeCasteljauStrategies selectedStrategyValue = (DeCasteljauStrategies) Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
+            DeCasteljauStrategy selectedDeCasteljau = StrategyFactory.Create(graphics, selectedStrategyValue);
+            Iterate(selectedDeCasteljau, 0.03f);
+        }
+
+        private void Iterate(DeCasteljauStrategy selectedDeCasteljau, float step = 0.25f)
         {
             PointF[] controlPointsCopy = new PointF[controlPoints.Length];
-            Array.Copy(controlPoints, controlPointsCopy, controlPoints.Length);
-            DeCasteljauStrategies selectedStrategy = (DeCasteljauStrategies) Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
-            DeCasteljauStrategy deCasteljau = StrategyFactory.Create(graphics, selectedStrategy);
-            float actualDistance = 0.0f;
-            float step = 0.1f;
-            while (actualDistance < 1.0f)
+            float actualDistance;
+            for(actualDistance = 0.0f; actualDistance <= 1.0f; actualDistance += step)
             {
                 try
                 {
-                    deCasteljau.Draw(controlPoints, actualDistance);
+                    Array.Copy(controlPoints, controlPointsCopy, controlPoints.Length);
+                    selectedDeCasteljau.Draw(controlPointsCopy, actualDistance);
                 }
                 catch (Exception exception)
                 {
-                    elapsedTimeLbl.ForeColor = Color.DarkRed;
-                    elapsedTimeLbl.Text = "Error: " + exception.Message;
+                    DisplayErrorMessage(exception.Message);
                 }
-                actualDistance += step;
+            }
+            if (actualDistance < 1.0f) // run one last time if it hasn't overshoot 1 yet
+            {
+                Array.Copy(controlPoints, controlPointsCopy, controlPoints.Length);
+                selectedDeCasteljau.Draw(controlPointsCopy, actualDistance);
             }
         }
 
@@ -66,7 +91,7 @@ namespace DeCasteljauForm
             Stopwatch stopwatch = new Stopwatch();  // Ensure new Stopwatch instance
             stopwatch.Reset();
             stopwatch.Start();
-            executeSelectedDecasteljauMethod();
+            ExecuteSelectedDecasteljau();
             stopwatch.Stop();
             //elapsedTimeLbl.Text = $"Elapsed time: {stopwatch.ElapsedMilliseconds} ms";
         }

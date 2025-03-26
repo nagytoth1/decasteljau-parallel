@@ -6,9 +6,9 @@ namespace GraphicsDLL
 {
     public enum DeCasteljauStrategies
     {
-        ITERATIVE_SINGLETHREADED,
+        RECURSIVE_MULTITHREADED,
         ITERATIVE_MULTITHREADED,
-        RECURSIVE_MULTITHREADED
+        ITERATIVE_SINGLETHREADED,
     }
     public static class StrategyFactory
     {
