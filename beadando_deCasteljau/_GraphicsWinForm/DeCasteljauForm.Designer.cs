@@ -1,4 +1,4 @@
-﻿namespace _GraphicsWinForm
+﻿namespace DeCasteljauForm
 {
     partial class DeCasteljauForm
     {
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DeCasteljauForm));
             this.canvas = new System.Windows.Forms.PictureBox();
             this.rbCasteljauIter = new System.Windows.Forms.RadioButton();
             this.rbCasteljauRec = new System.Windows.Forms.RadioButton();
@@ -117,6 +118,7 @@
             this.Controls.Add(this.rbCasteljauRec);
             this.Controls.Add(this.rbCasteljauIter);
             this.Controls.Add(this.canvas);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DeCasteljauForm";
             this.Text = "Graphics";
             ((System.ComponentModel.ISupportInitialize)(this.canvas)).EndInit();

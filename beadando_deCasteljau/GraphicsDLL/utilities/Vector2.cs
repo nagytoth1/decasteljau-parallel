@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace _GraphicsDLL
+namespace GraphicsDLL
 {
     public struct Vector2
     {
