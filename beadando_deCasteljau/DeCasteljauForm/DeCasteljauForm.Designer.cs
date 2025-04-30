@@ -55,7 +55,7 @@
             this.executeBtn.TabIndex = 3;
             this.executeBtn.Text = "Execute";
             this.executeBtn.UseVisualStyleBackColor = true;
-            this.executeBtn.Click += new System.EventHandler(this.executeBtn_Click);
+            this.executeBtn.Click += new System.EventHandler(this.ExecuteButtonClicked);
             // 
             // elapsedTimeLbl
             // 

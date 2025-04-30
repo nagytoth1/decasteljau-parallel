@@ -10,9 +10,10 @@ namespace GraphicsDLL
 
         protected readonly SolidBrush brush;
         protected readonly Pen pen;
-        protected readonly object drawLock;
+        protected readonly object drawLock; // for parallel cases
 
         protected Graphics graphics;
+        private PointF lastResult;
 
         protected DeCasteljauStrategy(Graphics graphics)
         {
@@ -23,17 +24,25 @@ namespace GraphicsDLL
         }
 
         public void Draw(PointF[] controlPoints, float distance = .5f){
-            if (controlPoints == null || controlPoints.Length == 0) throw new ArgumentException("Control points should not be null or empty!", nameof(controlPoints));
-            DrawInternal(controlPoints, distance);
+            DrawControlPoints(controlPoints);
+            if (controlPoints == null || controlPoints.Length == 0) 
+                throw new ArgumentException("Control points should not be null or empty!", nameof(controlPoints));
+            PointF result = DrawInternal(controlPoints, distance);
+            if (this.lastResult != PointF.Empty)
+            {
+                graphics.DrawLine(pen, lastResult, result);
+            }
+            lastResult = result;
+            graphics.DrawPoint(pen, brush, result, POINT_SIZE);
         }
 
-        protected abstract void DrawInternal(PointF[] controlPoints, float distance = .5f);
+        protected abstract PointF DrawInternal(PointF[] controlPoints, float distance = .5f);
 
         protected void DrawControlPoints(PointF[] controlPoints)
         {
             foreach (PointF point in controlPoints)
             {
-                graphics.DrawPoint(pen, brush, point, 5f);
+                graphics.DrawPoint(pen, Brushes.Magenta, point, 5f);
             }
         }
     }

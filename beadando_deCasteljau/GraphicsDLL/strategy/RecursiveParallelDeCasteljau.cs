@@ -3,7 +3,7 @@ using System;
 using System.Drawing;
 using System.Threading.Tasks;
 
-namespace DeCasteljauForm
+namespace GraphicsDLL
 {
     public class RecursiveParallelDeCasteljau : DeCasteljauStrategy
     {
@@ -11,15 +11,14 @@ namespace DeCasteljauForm
         {
         }
 
-        protected override void DrawInternal(PointF[] controlPoints, float distance = 0.5f)
+        protected override PointF DrawInternal(PointF[] controlPoints, float distance = 0.5f)
         {
-            CallDrawRecursive(controlPoints, distance);
-            throw new NotImplementedException("todo");
+            return CallDrawRecursive(controlPoints, distance);
         }
 
-        private void CallDrawRecursive(PointF[] controlPoints, float distance = 0.5f)
+        private PointF CallDrawRecursive(PointF[] controlPoints, float distance = 0.5f)
         {
-
+            return PointF.Empty;
         }
     }
 }

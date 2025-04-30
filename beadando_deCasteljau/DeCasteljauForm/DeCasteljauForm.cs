@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GraphicsDLL;
 
@@ -9,23 +10,36 @@ namespace DeCasteljauForm
     public partial class DeCasteljauForm : Form
     {
         Graphics graphics;
-
-        Random rnd = new Random();
         PointF[] controlPoints;
-
-
-        private readonly Stopwatch stopwatch;
+        private readonly Stopwatch stopwatch = new Stopwatch();
         public DeCasteljauForm()
         {
             this.stopwatch = new Stopwatch();
-            this.controlPoints = new PointF[] {
-                new PointF( 100, 300 ),
-                new PointF( 200, 100 ),
-                new PointF( 500, 100 ),
-                new PointF( 600, 300 )
-            };
             InitializeComponent();
+            this.controlPoints = InitializeControlPoints(50);
             AddAvailableStrategies();
+        }
+
+        private PointF[] InitializeControlPoints(int quantity)
+        {
+            PointF[] pointsArray = new PointF[quantity];
+            int minX = 10;
+            int maxX = canvas.Width - 10;
+            int step = (maxX - minX) / quantity;
+            int actualX = minX;
+            pointsArray[0] = new PointF(actualX, 100);
+            actualX += step;
+            pointsArray[1] = new PointF(actualX, 100);
+            for (int i = 2; i < quantity - 2; i++)
+            {
+                actualX += step;
+                pointsArray[i] = new PointF(actualX, 400);
+            }
+            actualX += step;
+            pointsArray[quantity-2] = new PointF(actualX, 100);
+            actualX += step;
+            pointsArray[quantity-1] = new PointF(actualX, 100);
+            return pointsArray;
         }
 
         private void AddAvailableStrategies()
@@ -47,19 +61,6 @@ namespace DeCasteljauForm
             elapsedTimeLbl.ForeColor = Color.White;
             elapsedTimeLbl.BackColor = Color.DarkRed;
             elapsedTimeLbl.Text = $"Error: {message}";
-        }
-
-        private void ExecuteSelectedDecasteljau()
-        {
-            if (cbDecasteljau.SelectedItem == null || string.IsNullOrWhiteSpace(cbDecasteljau.SelectedItem.ToString()))
-            {
-                DisplayErrorMessage("Please, select an implementation first!");
-                return;
-            }
-
-            DeCasteljauStrategies selectedStrategyValue = (DeCasteljauStrategies) Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
-            DeCasteljauStrategy selectedDeCasteljau = StrategyFactory.Create(graphics, selectedStrategyValue);
-            Iterate(selectedDeCasteljau, 0.03f);
         }
 
         private void Iterate(DeCasteljauStrategy selectedDeCasteljau, float step = 0.25f)
@@ -85,15 +86,29 @@ namespace DeCasteljauForm
             }
         }
 
-        private void executeBtn_Click(object sender, EventArgs e)
+        private async void ExecuteButtonClicked(object sender, EventArgs e)
         {
             graphics.Clear(Color.White);
-            Stopwatch stopwatch = new Stopwatch();  // Ensure new Stopwatch instance
             stopwatch.Reset();
             stopwatch.Start();
-            ExecuteSelectedDecasteljau();
+            await ExecuteSelectedDeCasteljau();
             stopwatch.Stop();
-            //elapsedTimeLbl.Text = $"Elapsed time: {stopwatch.ElapsedMilliseconds} ms";
+            elapsedTimeLbl.Text = $"Elapsed time: {stopwatch.ElapsedMilliseconds} ms";
+        }
+
+        private async Task ExecuteSelectedDeCasteljau()
+        {
+            if (cbDecasteljau.SelectedItem == null || string.IsNullOrWhiteSpace(cbDecasteljau.SelectedItem.ToString()))
+            {
+                DisplayErrorMessage("Please, select an implementation first!");
+                return;
+            }
+            DeCasteljauStrategies selectedStrategyValue = (DeCasteljauStrategies)Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
+            await Task.Run(() =>
+            {
+                DeCasteljauStrategy selectedDeCasteljau = DeCasteljauFactory.Create(graphics, selectedStrategyValue);
+                Iterate(selectedDeCasteljau);
+            });
         }
     }
 }
