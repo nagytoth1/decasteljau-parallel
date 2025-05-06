@@ -31,7 +31,7 @@ namespace CLI
                 //PrintArray(result);
                 method();
                 sw.Stop();
-                Console.WriteLine($"time = {sw.Elapsed.TotalMilliseconds} ms");
+                Console.WriteLine($"végrehajtási idő = {sw.Elapsed.TotalMilliseconds} ms");
                 totalRunTime += sw.Elapsed.TotalMilliseconds;
             }
             return totalRunTime / numberOfRuns;

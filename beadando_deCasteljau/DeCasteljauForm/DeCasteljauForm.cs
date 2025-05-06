@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GraphicsDLL;
@@ -11,36 +12,34 @@ namespace DeCasteljauForm
     {
         Graphics graphics;
         PointF[] controlPoints;
-        private readonly Stopwatch stopwatch = new Stopwatch();
+        PointF[] controlPointsMirrored;
         public DeCasteljauForm()
         {
-            this.stopwatch = new Stopwatch();
             InitializeComponent();
-            this.controlPoints = InitializeControlPoints(50);
+            this.controlPoints = GenerateControlPoints(200, canvas.Width);
+            this.controlPointsMirrored = GenerateControlPoints(200, canvas.Width, -1);
             AddAvailableStrategies();
         }
 
-        private PointF[] InitializeControlPoints(int quantity)
+        private static PointF[] GenerateControlPoints(int numberOfControlPoints, int maxWidth, int multiplier = 1)
         {
-            PointF[] pointsArray = new PointF[quantity];
-            int minX = 10;
-            int maxX = canvas.Width - 10;
-            int step = (maxX - minX) / quantity;
-            int actualX = minX;
-            pointsArray[0] = new PointF(actualX, 100);
-            actualX += step;
-            pointsArray[1] = new PointF(actualX, 100);
-            for (int i = 2; i < quantity - 2; i++)
+            PointF[] points = new PointF[numberOfControlPoints];
+            float frequency = 1 * (float)Math.PI / numberOfControlPoints; // Controls wave length
+            float spacing = maxWidth / numberOfControlPoints;
+            const int AMPLITUDE = 600; // Height of the wave
+            const int MARGIN_X = 60; // pixels from the left of the canvas
+            const int MARGIN_Y = 30; // pixels from the top of the canvas
+
+            for (int i = 0; i < numberOfControlPoints; i++)
             {
-                actualX += step;
-                pointsArray[i] = new PointF(actualX, 400);
+                float x = i * spacing; // spacing between points
+                float y = multiplier * AMPLITUDE * (float)Math.Sin(frequency * i); // if -1 it will be upside down
+                points[i] = new PointF(x + MARGIN_X, y + MARGIN_Y);
             }
-            actualX += step;
-            pointsArray[quantity-2] = new PointF(actualX, 100);
-            actualX += step;
-            pointsArray[quantity-1] = new PointF(actualX, 100);
-            return pointsArray;
+
+            return points;
         }
+
 
         private void AddAvailableStrategies()
         {
@@ -63,52 +62,41 @@ namespace DeCasteljauForm
             elapsedTimeLbl.Text = $"Error: {message}";
         }
 
-        private void Iterate(DeCasteljauStrategy selectedDeCasteljau, float step = 0.25f)
+        private void ExecuteButtonClicked(object sender, EventArgs e)
         {
-            PointF[] controlPointsCopy = new PointF[controlPoints.Length];
-            float actualDistance;
-            for(actualDistance = 0.0f; actualDistance <= 1.0f; actualDistance += step)
-            {
-                try
-                {
-                    Array.Copy(controlPoints, controlPointsCopy, controlPoints.Length);
-                    selectedDeCasteljau.Draw(controlPointsCopy, actualDistance);
-                }
-                catch (Exception exception)
-                {
-                    DisplayErrorMessage(exception.Message);
-                }
-            }
-            if (actualDistance < 1.0f) // run one last time if it hasn't overshoot 1 yet
-            {
-                Array.Copy(controlPoints, controlPointsCopy, controlPoints.Length);
-                selectedDeCasteljau.Draw(controlPointsCopy, actualDistance);
-            }
-        }
-
-        private async void ExecuteButtonClicked(object sender, EventArgs e)
-        {
-            graphics.Clear(Color.White);
-            stopwatch.Reset();
+            graphics.Clear(SystemColors.Control);
+            Stopwatch stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
-            await ExecuteSelectedDeCasteljau();
+            ExecuteSelectedDeCasteljau();
             stopwatch.Stop();
             elapsedTimeLbl.Text = $"Elapsed time: {stopwatch.ElapsedMilliseconds} ms";
         }
 
-        private async Task ExecuteSelectedDeCasteljau()
+        private void ExecuteSelectedDeCasteljau()
         {
             if (cbDecasteljau.SelectedItem == null || string.IsNullOrWhiteSpace(cbDecasteljau.SelectedItem.ToString()))
             {
                 DisplayErrorMessage("Please, select an implementation first!");
                 return;
             }
-            DeCasteljauStrategies selectedStrategyValue = (DeCasteljauStrategies)Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
-            await Task.Run(() =>
+            DeCasteljauStrategies selectedStrategy = (DeCasteljauStrategies)Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
+            DeCasteljauStrategy selectedImplementation1 = DeCasteljauFactory.Create(controlPoints, 0.01f, selectedStrategy);
+            DeCasteljauStrategy selectedImplementation2 = DeCasteljauFactory.Create(controlPointsMirrored, 0.01f, selectedStrategy);
+            PointF[] curvePoints = selectedImplementation1.Iterate();
+            PointF[] mirroredCurvePoints = selectedImplementation2.Iterate();
+            DrawResult(curvePoints);
+            DrawResult(mirroredCurvePoints);
+        }
+
+        private void DrawResult(PointF[] curvePoints)
+        {
+            Pen pen = new Pen(Color.Black, 3f);
+            PointF previousPoint = curvePoints[0];
+            for (int i = 1; i < curvePoints.Length; i++)
             {
-                DeCasteljauStrategy selectedDeCasteljau = DeCasteljauFactory.Create(graphics, selectedStrategyValue);
-                Iterate(selectedDeCasteljau);
-            });
+                graphics.DrawLine(pen, previousPoint, curvePoints[i]);
+                previousPoint = curvePoints[i];
+            }
         }
     }
 }
