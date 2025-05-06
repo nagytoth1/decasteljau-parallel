@@ -1,24 +1,15 @@
-﻿using GraphicsDLL;
-using System;
+﻿using System;
 using System.Drawing;
-using System.Threading.Tasks;
 
 namespace GraphicsDLL
 {
     public class RecursiveParallelDeCasteljau : DeCasteljauStrategy
     {
-        public RecursiveParallelDeCasteljau(Graphics graphics) : base(graphics)
-        {
-        }
+        public RecursiveParallelDeCasteljau(PointF[] controlPoints, float increment) : base(controlPoints, increment) { }
 
-        protected override PointF DrawInternal(PointF[] controlPoints, float distance = 0.5f)
+        public override PointF[] Iterate()
         {
-            return CallDrawRecursive(controlPoints, distance);
-        }
-
-        private PointF CallDrawRecursive(PointF[] controlPoints, float distance = 0.5f)
-        {
-            return PointF.Empty;
+            throw new NotImplementedException();
         }
     }
 }

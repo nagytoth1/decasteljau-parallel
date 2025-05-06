@@ -10,14 +10,15 @@ namespace GraphicsDLL
         /// </summary>
         /// <param name="pointA">Point "A"</param>
         /// <param name="pointB">Point "B"</param>
-        /// <param name="distance">The distance between 2 points</param>
+        /// <param name="t">The distance between 2 points</param>
         /// <returns></returns>
-        public static PointF LinearInterpolate(this PointF pointA, PointF pointB, float distance = 0.5f)
+        public static PointF Interpolate(this PointF pointA, PointF pointB, float t)
         {
-            if (distance < 0 || distance > 1) throw new ArgumentException("Invalid distance value, it must be between 0 and 1.");
+            if (t < 0 || t > 1) 
+                throw new ArgumentException("Invalid distance value, it must be between 0 and 1.");
 
-            return new PointF(pointA.X + (pointB.X - pointA.X) * distance,
-                              pointA.Y + (pointB.Y - pointA.Y) * distance);
+            return new PointF(pointA.X + (pointB.X - pointA.X) * t,
+                              pointA.Y + (pointB.Y - pointA.Y) * t);
         }
     }
 }

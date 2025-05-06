@@ -1,25 +1,33 @@
-﻿using GraphicsDLL;
+﻿using System;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace GraphicsDLL
 {
     public class IterativeParallelDeCasteljau : DeCasteljauStrategy
     {
-        public IterativeParallelDeCasteljau(Graphics graphics) : base(graphics)
-        {
-        }
+        public IterativeParallelDeCasteljau(PointF[] controlPoints, float increment) : base(controlPoints, increment) { }
 
-        protected override PointF DrawInternal(PointF[] controlPoints, float distance = 0.5F)
+        public override PointF[] Iterate()
         {
-            int numberOfControlPoints = controlPoints.Length;
-            for (int i = 0; i < numberOfControlPoints; i++)
+            int numberOfSteps = (int)Math.Round(1f / increment) + 1;
+            PointF[] points = new PointF[numberOfSteps];
+            int chunkSize = 5;
+            int numberOfChunks = (numberOfSteps + chunkSize - 1) / chunkSize;
+
+
+            Parallel.For(0, numberOfChunks, chunkIndex =>
             {
-                for (int j = 0; j < numberOfControlPoints - i - 1; j++)
+                int start = chunkIndex * chunkSize;
+                int end = Math.Min(start + chunkSize, numberOfSteps);
+                for (int i = start; i < end; ++i)
                 {
-                    controlPoints[j] = controlPoints[j].LinearInterpolate(controlPoints[j + 1], distance);
+                    float t = i * increment;
+                    points[i] = DecasteljauSequential(controlPoints, t);
                 }
-            }
-            return controlPoints[0];
+            });
+
+            return points;
         }
     }
 }

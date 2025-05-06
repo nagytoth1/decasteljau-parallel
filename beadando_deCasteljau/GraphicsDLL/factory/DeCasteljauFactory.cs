@@ -13,19 +13,19 @@ namespace GraphicsDLL
     }
     public static class DeCasteljauFactory
     {
-        private static readonly Dictionary<DeCasteljauStrategies, Func<Graphics, DeCasteljauStrategy>> algorithms = new Dictionary<DeCasteljauStrategies, Func<Graphics, DeCasteljauStrategy>>()
+        private static readonly Dictionary<DeCasteljauStrategies, Func<PointF[], float, DeCasteljauStrategy>> algorithms = new Dictionary<DeCasteljauStrategies, Func<PointF[], float, DeCasteljauStrategy>>()
         {
-            {  DeCasteljauStrategies.RECURSIVE_MULTITHREADED, graphics => new RecursiveParallelDeCasteljau(graphics)},
-            {  DeCasteljauStrategies.ITERATIVE_MULTITHREADED, graphics => new IterativeParallelDeCasteljau(graphics)},
-            {  DeCasteljauStrategies.ITERATIVE_SINGLE_THREADED, graphics => new IterativeSingleDeCasteljau(graphics)},
-            {  DeCasteljauStrategies.RECURSIVE_SINGLE_THREADED, graphics => new RecursiveSingleDeCasteljau(graphics)},
+            {  DeCasteljauStrategies.ITERATIVE_SINGLE_THREADED, (controlPoints, increment) => new IterativeSingleDeCasteljau(controlPoints, increment)},
+            {  DeCasteljauStrategies.ITERATIVE_MULTITHREADED, (controlPoints, increment) => new IterativeParallelDeCasteljau(controlPoints, increment)},
+            {  DeCasteljauStrategies.RECURSIVE_SINGLE_THREADED, (controlPoints, increment) => new RecursiveSingleDeCasteljau(controlPoints, increment)},
+            {  DeCasteljauStrategies.RECURSIVE_MULTITHREADED, (controlPoints, increment) => new RecursiveParallelDeCasteljau(controlPoints, increment)},
         };
-        public static DeCasteljauStrategy Create(Graphics graphics, DeCasteljauStrategies strategy)
+        public static DeCasteljauStrategy Create(PointF[] controlPoints, float increment, DeCasteljauStrategies strategy)
         {
             Console.WriteLine($"Selected strategy: {strategy}");
             if(algorithms.TryGetValue(strategy, out var strategyFactory))
             {
-                return strategyFactory(graphics);
+                return strategyFactory(controlPoints, increment);
             }
             else
             {

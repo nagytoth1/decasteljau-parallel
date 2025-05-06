@@ -1,27 +1,24 @@
 ﻿using GraphicsDLL;
+using System;
 using System.Drawing;
 
 namespace GraphicsDLL
 {
     public class IterativeSingleDeCasteljau : DeCasteljauStrategy
     {
-        public const int DECASTELJAU_DISTANCE_MAX = 1;
+        public IterativeSingleDeCasteljau(PointF[] controlPoints, float increment) : base(controlPoints, increment) { }
 
-        public IterativeSingleDeCasteljau(Graphics graphics) : base(graphics)
+        public override PointF[] Iterate()
         {
-        }
+            int numberOfSteps = (int)Math.Round(1f / increment) + 1;
 
-        protected override PointF DrawInternal(PointF[] controlPoints, float distance = 0.5F)
-        {
-            int numberOfControlPoints = controlPoints.Length;
-            for (int i = 0; i < numberOfControlPoints; i++)
+            PointF[] points = new PointF[numberOfSteps];
+            for (int i = 0; i < numberOfSteps; i++)
             {
-                for (int j = 0; j < numberOfControlPoints - i - 1; j++)
-                {
-                    controlPoints[j] = controlPoints[j].LinearInterpolate(controlPoints[j + 1], distance);
-                }
+                float t = i * increment;
+                points[i] = DecasteljauSequential(controlPoints, t);
             }
-            return controlPoints[0];
+            return points;
         }
     }
 }

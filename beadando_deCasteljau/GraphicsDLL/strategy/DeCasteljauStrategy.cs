@@ -5,45 +5,60 @@ namespace GraphicsDLL
 {
     public abstract class DeCasteljauStrategy
     {
-        protected const float POINT_SIZE = 3.5f;
-        protected const byte NUMBER_OF_THREADS = 4;
+        protected float increment;
+        protected PointF[] controlPoints;
 
-        protected readonly SolidBrush brush;
-        protected readonly Pen pen;
-        protected readonly object drawLock; // for parallel cases
-
-        protected Graphics graphics;
-        private PointF lastResult;
-
-        protected DeCasteljauStrategy(Graphics graphics)
-        {
-            this.graphics = graphics;
-            brush = new SolidBrush(Color.Salmon);
-            pen = new Pen(Color.Black, 2f);
-            drawLock = new object();
+        public float Increment {
+            get { return this.increment; } 
+            set {
+                if (value <= 0 || value >= 1)
+                {
+                    throw new ArgumentException("Increment value must be greater than 0 and smaller than 1!", nameof(value));
+                }
+                this.increment = value;
+            }
         }
 
-        public void Draw(PointF[] controlPoints, float distance = .5f){
-            DrawControlPoints(controlPoints);
-            if (controlPoints == null || controlPoints.Length == 0) 
-                throw new ArgumentException("Control points should not be null or empty!", nameof(controlPoints));
-            PointF result = DrawInternal(controlPoints, distance);
-            if (this.lastResult != PointF.Empty)
-            {
-                graphics.DrawLine(pen, lastResult, result);
-            }
-            lastResult = result;
-            graphics.DrawPoint(pen, brush, result, POINT_SIZE);
+        public PointF[] ControlPoints { 
+            get { return this.controlPoints; } 
+            set {
+                if (value == null || value.Length == 0)
+                {
+                    throw new ArgumentException("Array of control points cannot be null or empty!", nameof(value));
+                }
+                this.controlPoints = value; 
+            } }
+
+        protected DeCasteljauStrategy(PointF[] controlPoints, float increment)
+        {
+            this.Increment = increment; 
+            this.controlPoints = controlPoints;
         }
 
-        protected abstract PointF DrawInternal(PointF[] controlPoints, float distance = .5f);
+        public abstract PointF[] Iterate();
 
-        protected void DrawControlPoints(PointF[] controlPoints)
+        protected PointF DecasteljauSequential(PointF[] controlPoints, float t)
         {
-            foreach (PointF point in controlPoints)
+            PointF[] currentLevel = controlPoints;
+            for (int i = 0; i < controlPoints.Length - 1; i++)
             {
-                graphics.DrawPoint(pen, Brushes.Magenta, point, 5f);
+                currentLevel = InterpolateControlPointsSequential(currentLevel, t);
             }
+
+            return currentLevel[0];
+        }
+
+        protected PointF[] InterpolateControlPointsSequential(PointF[] controlPoints, float t)
+        {
+            int numberOfControlPoints = controlPoints.Length - 1;
+            PointF[] interpolatedPoints = new PointF[numberOfControlPoints];
+            for (int i = 0; i < numberOfControlPoints; i++)
+            {
+                interpolatedPoints[i] = controlPoints[i].Interpolate(
+                    controlPoints[i + 1],
+                    t);
+            }
+            return interpolatedPoints;
         }
     }
 }

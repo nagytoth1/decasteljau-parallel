@@ -1,24 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GraphicsDLL
 {
     public class RecursiveSingleDeCasteljau : DeCasteljauStrategy
     {
-        public RecursiveSingleDeCasteljau(Graphics graphics) : base(graphics) { }
-        protected override PointF DrawInternal(PointF[] controlPoints, float distance = 0.5F)
+        public RecursiveSingleDeCasteljau(PointF[] controlPoints, float increment) : base(controlPoints, increment)
         {
-            PointF result = DeCasteljauRecursive(graphics,
-                controlPoints,
-                distance)[0];
-            return result;
         }
 
-        private PointF[] DeCasteljauRecursive(Graphics graphics, PointF[] controlPoints, float distance = .5f)
+        public override PointF[] Iterate()
+        {
+            int numberOfSteps = (int)Math.Round(1f / increment) + 1;
+            PointF[] points = new PointF[numberOfSteps];
+            
+            for (int i = 0; i < numberOfSteps; ++i)
+            {
+                float t = i * increment;
+                points[i] = DeCasteljauRecursive(
+                    controlPoints,
+                    t)[0]; // base condition --> will always return 1 controlPoint
+            }
+
+            return points;
+        }
+
+        private PointF[] DeCasteljauRecursive(PointF[] controlPoints, float t)
         {
             if (controlPoints.Length == 1) //base condition
                 return controlPoints;
@@ -27,11 +34,9 @@ namespace GraphicsDLL
             int i;
             for (i = 0; i < controlPoints.Length - 1; i++)
             {
-                newPoints[i] = controlPoints[i].LinearInterpolate(controlPoints[i + 1], distance);
+                newPoints[i] = controlPoints[i].Interpolate(controlPoints[i + 1], t);
             }
-            return DeCasteljauRecursive(graphics,
-                newPoints,
-                distance);
+            return DeCasteljauRecursive(newPoints, t);
         }
     }
 }

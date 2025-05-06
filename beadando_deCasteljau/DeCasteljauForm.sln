@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeCasteljauForm", "DeCastel
 		{B20860AC-43FF-4BEF-BD88-A84E411341D4} = {B20860AC-43FF-4BEF-BD88-A84E411341D4}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI", "CLI\CLI.csproj", "{21554DD0-898B-4035-AB2E-CFEAE809B286}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{AAD63873-00A3-4EAD-8A43-452EB9D4C4E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAD63873-00A3-4EAD-8A43-452EB9D4C4E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAD63873-00A3-4EAD-8A43-452EB9D4C4E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21554DD0-898B-4035-AB2E-CFEAE809B286}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21554DD0-898B-4035-AB2E-CFEAE809B286}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21554DD0-898B-4035-AB2E-CFEAE809B286}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21554DD0-898B-4035-AB2E-CFEAE809B286}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
