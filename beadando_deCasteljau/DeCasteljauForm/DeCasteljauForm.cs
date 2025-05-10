@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 using GraphicsDLL;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace DeCasteljauForm
 {
@@ -19,6 +20,7 @@ namespace DeCasteljauForm
             this.controlPointsMirrored = GenerateMirroredControlPoints();
             AddAvailableStrategies();
             cbDecasteljau.SelectedIndex = 0;
+            executeBtn.Focus();
         }
 
         private PointF[] GenerateControlPoints(int numberOfControlPoints, int maxWidth)
@@ -28,7 +30,7 @@ namespace DeCasteljauForm
             float spacing = maxWidth / numberOfControlPoints;
             const int AMPLITUDE = 600; // Height of the wave
             const int MARGIN_X = 60; // pixels from the left of the canvas
-            const int MARGIN_Y = 30; // pixels from the top of the canvas
+            const int MARGIN_Y = 50; // pixels from the top of the canvas
 
             for (int i = 0; i < numberOfControlPoints; i++)
             {
@@ -44,11 +46,12 @@ namespace DeCasteljauForm
         {
             int n = this.controlPoints.Length;
             PointF[] points = new PointF[n];
-
+            const int AMPLITUDE = 600; // Height of the wave
+            const int MARGIN_Y = 50; // pixels from the top of the canvas
             for (int i = 0; i < n; i++)
             {
                 PointF originalPoint = this.controlPoints[i];
-                points[i] = new PointF(originalPoint.X, -originalPoint.Y);
+                points[i] = new PointF(originalPoint.X, -originalPoint.Y + AMPLITUDE + MARGIN_Y);
             }
 
             return points;
@@ -71,19 +74,17 @@ namespace DeCasteljauForm
 
         private void DisplayErrorMessage(string message)
         {
-            elapsedTimeLbl.ForeColor = Color.White;
-            elapsedTimeLbl.BackColor = Color.DarkRed;
-            elapsedTimeLbl.Text = $"Error: {message}";
+            statusLbl.ForeColor = Color.White;
+            statusLbl.BackColor = Color.DarkRed;
+            statusLbl.Text = $"Error: {message}";
         }
 
         private void ExecuteButtonClicked(object sender, EventArgs e)
         {
-            graphics.Clear(SystemColors.Control);
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
+            // Clear the canvas with a transparent background
+            DrawBackground(graphics);
             ExecuteSelectedDeCasteljau();
-            stopwatch.Stop();
-            elapsedTimeLbl.Text = $"Elapsed time: {stopwatch.ElapsedMilliseconds} ms";
+            executeBtn.Focus();
         }
 
         private void ExecuteSelectedDeCasteljau()
@@ -94,10 +95,14 @@ namespace DeCasteljauForm
                 return;
             }
             DeCasteljauStrategies selectedStrategy = (DeCasteljauStrategies)Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
-            DeCasteljauStrategy selectedImplementation1 = DeCasteljauFactory.Create(controlPoints, 0.01f, selectedStrategy);
-            DeCasteljauStrategy selectedImplementation2 = DeCasteljauFactory.Create(controlPointsMirrored, 0.01f, selectedStrategy);
-            PointF[] curvePoints = selectedImplementation1.Iterate();
-            PointF[] mirroredCurvePoints = selectedImplementation2.Iterate();
+            DeCasteljauStrategy selectedImplementation = DeCasteljauFactory.Create(controlPoints, 0.01f, selectedStrategy);
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+            PointF[] curvePoints = selectedImplementation.Iterate();
+            selectedImplementation.ControlPoints = controlPointsMirrored;
+            PointF[] mirroredCurvePoints = selectedImplementation.Iterate(); // reiterate with mirrored control points 
+            stopwatch.Stop();
+            statusLbl.Text = $"Elapsed time: {stopwatch.ElapsedMilliseconds} ms";
             DrawResult(curvePoints);
             DrawResult(mirroredCurvePoints);
         }
@@ -110,6 +115,20 @@ namespace DeCasteljauForm
             {
                 graphics.DrawLine(pen, previousPoint, curvePoints[i]);
                 previousPoint = curvePoints[i];
+            }
+        }
+
+        private void DeCasteljauForm_Paint(object sender, PaintEventArgs e)
+        {
+            DrawBackground(e.Graphics);
+        }
+
+        private void DrawBackground(Graphics graphics)
+        {
+            using (var brush = new System.Drawing.Drawing2D.LinearGradientBrush(this.ClientRectangle,
+                              Color.LightBlue, Color.LightGreen, 45F))
+            {
+                graphics.FillRectangle(brush, this.ClientRectangle);
             }
         }
     }

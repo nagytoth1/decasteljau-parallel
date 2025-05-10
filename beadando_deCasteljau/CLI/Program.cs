@@ -11,30 +11,54 @@ namespace CLI
         {
             PointF[] controlPoints = FillControlPointsArray(100);
             const float increment = 0.001f;
+
             DeCasteljauStrategy selectedStrategy = new IterativeSingleDeCasteljau(controlPoints, increment);
-            double avgSequentialTimeMs = MeasureAverageRuntime(() => selectedStrategy.Iterate());
+            double sequentialTimeMs = MeasureExecutionTime(() => selectedStrategy.Iterate());
+
             selectedStrategy = new IterativeParallelDeCasteljau(controlPoints, increment);
-            double avgParallelTimeMs = MeasureAverageRuntime(() => selectedStrategy.Iterate());
-            Console.WriteLine("Szekvenciális DeCasteljau: végrehajtási idő {0} ms", avgSequentialTimeMs);
-            Console.WriteLine("Párhuzamos DeCasteljau: végrehajtási idő {0} ms", avgParallelTimeMs);
-            Console.WriteLine("Gyorsítás: {0:0.00}", avgSequentialTimeMs / avgParallelTimeMs);
+            double parallelTimeMs1 = MeasureExecutionTime(() => selectedStrategy.Iterate());
+
+            selectedStrategy = new IterativeTPLDecasteljau(controlPoints, increment);
+            double parallelTimeMs2 = MeasureExecutionTime(() => selectedStrategy.Iterate());
+
+            selectedStrategy = new RecursiveParallelDeCasteljau(controlPoints, increment);
+            double parallelTimeMs3 = MeasureExecutionTime(() => selectedStrategy.Iterate());
+
+
+            Console.WriteLine("DeCasteljau Execution Times (ms) - Average of 10 consequent executions:");
+            Console.WriteLine("--------------------------------------------------------");
+            Console.WriteLine("{0,-35} {1,10}", "Strategy", "Execution Time (ms)");
+            Console.WriteLine("--------------------------------------------------------");
+            Console.WriteLine("{0,-35} {1,10:F4}", "Iterative Single DeCasteljau", sequentialTimeMs);
+            Console.WriteLine("{0,-35} {1,10:F4}", "Iterative Parallel DeCasteljau", parallelTimeMs1);
+            Console.WriteLine("{0,-35} {1,10:F4}", "Iterative TPL DeCasteljau", parallelTimeMs2);
+            Console.WriteLine("{0,-35} {1,10:F4}", "Recursive Parallel DeCasteljau", parallelTimeMs3);
+            Console.WriteLine("--------------------------------------------------------");
+
+            Console.WriteLine("Speedup with Parallel.For: {0:0.00}", sequentialTimeMs / parallelTimeMs1);
+            Console.WriteLine("Speedup with TPL: {0:0.00}", sequentialTimeMs / parallelTimeMs2);
+            Console.WriteLine("Speedup with Recursive + TPL: {0:0.00}", sequentialTimeMs / parallelTimeMs3);
+
             Console.ReadKey();
         }
 
-        static double MeasureAverageRuntime(Func<PointF[]> method, int numberOfRuns = 10)
+        static double MeasureExecutionTime(Func<PointF[]> method)
         {
-            double totalRunTime = 0;
-            for (int i = 0; i < numberOfRuns; i++)
+            double totalExecutionTime = 0;
+            const int NUMBER_OF_RUNS = 10;
+
+            for (int i = 0; i < NUMBER_OF_RUNS; i++)
             {
                 var sw = Stopwatch.StartNew();
                 //PointF[] result = method();
                 //PrintArray(result);
                 method();
                 sw.Stop();
-                Console.WriteLine($"végrehajtási idő = {sw.Elapsed.TotalMilliseconds} ms");
-                totalRunTime += sw.Elapsed.TotalMilliseconds;
+                totalExecutionTime += sw.Elapsed.TotalMilliseconds;
             }
-            return totalRunTime / numberOfRuns;
+
+            // the average of several runs
+            return totalExecutionTime / NUMBER_OF_RUNS; 
         }
 
         private static PointF[] FillControlPointsArray(int numberOfControlPoints)
