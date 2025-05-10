@@ -43,13 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="factory\DeCasteljauFactory.cs" />
+    <Compile Include="factory\DeCasteljauStrategies.cs" />
     <Compile Include="strategy\abstract\DeCasteljauStrategy.cs" />
     <Compile Include="strategy\abstract\IterativeDeCasteljau.cs" />
     <Compile Include="strategy\implementation\IterativeTPLDeCasteljau.cs" />
     <Compile Include="strategy\abstract\RecursiveDeCasteljau.cs" />
     <Compile Include="strategy\implementation\RecursiveSingleDeCasteljau.cs" />
     <Compile Include="utilities\ExtendedGraphics.cs" />
-    <Compile Include="utilities\ExtendedPointF.cs" />
     <Compile Include="strategy\implementation\IterativeParallelDeCasteljau.cs" />
     <Compile Include="strategy\implementation\IterativeSingleDeCasteljau.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

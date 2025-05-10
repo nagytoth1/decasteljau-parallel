@@ -4,14 +4,6 @@ using System.Drawing;
 
 namespace GraphicsDLL
 {
-    public enum DeCasteljauStrategies
-    {
-        RECURSIVE_MULTITHREADED,
-        ITERATIVE_MULTITHREADED,
-        ITERATIVE_TPL_MULTITHREADED,
-        ITERATIVE_SINGLE_THREADED,
-        RECURSIVE_SINGLE_THREADED,
-    }
     public static class DeCasteljauFactory
     {
         private static readonly Dictionary<DeCasteljauStrategies, Func<PointF[], float, DeCasteljauStrategy>> algorithms = new Dictionary<DeCasteljauStrategies, Func<PointF[], float, DeCasteljauStrategy>>()

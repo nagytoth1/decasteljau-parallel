@@ -38,9 +38,9 @@
             // 
             // canvas
             // 
-            this.canvas.Location = new System.Drawing.Point(12, 33);
+            this.canvas.Location = new System.Drawing.Point(10, 33);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(1163, 721);
+            this.canvas.Size = new System.Drawing.Size(1170, 720);
             this.canvas.TabIndex = 0;
             this.canvas.TabStop = false;
             this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.OnCanvasPainted);
@@ -48,10 +48,11 @@
             // executeBtn
             // 
             this.executeBtn.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.executeBtn.Location = new System.Drawing.Point(1093, 3);
-            this.executeBtn.Margin = new System.Windows.Forms.Padding(2);
+            this.executeBtn.Location = new System.Drawing.Point(1070, 5);
+            this.executeBtn.Margin = new System.Windows.Forms.Padding(0);
             this.executeBtn.Name = "executeBtn";
-            this.executeBtn.Size = new System.Drawing.Size(80, 25);
+            this.executeBtn.Padding = new System.Windows.Forms.Padding(2);
+            this.executeBtn.Size = new System.Drawing.Size(100, 30);
             this.executeBtn.TabIndex = 3;
             this.executeBtn.Text = "Execute";
             this.executeBtn.UseVisualStyleBackColor = true;
@@ -69,11 +70,12 @@
             // 
             // cbDecasteljau
             // 
+            this.cbDecasteljau.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbDecasteljau.Font = new System.Drawing.Font("Consolas", 12F);
             this.cbDecasteljau.FormattingEnabled = true;
-            this.cbDecasteljau.Location = new System.Drawing.Point(12, 3);
+            this.cbDecasteljau.Location = new System.Drawing.Point(10, 5);
             this.cbDecasteljau.Name = "cbDecasteljau";
-            this.cbDecasteljau.Size = new System.Drawing.Size(268, 27);
+            this.cbDecasteljau.Size = new System.Drawing.Size(400, 27);
             this.cbDecasteljau.TabIndex = 6;
             // 
             // DeCasteljauForm
