@@ -43,15 +43,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="factory\DeCasteljauFactory.cs" />
-    <Compile Include="strategy\DeCasteljauStrategy.cs" />
-    <Compile Include="strategy\RecursiveSingleDeCasteljau.cs" />
+    <Compile Include="strategy\abstract\DeCasteljauStrategy.cs" />
+    <Compile Include="strategy\abstract\IterativeDeCasteljau.cs" />
+    <Compile Include="strategy\implementation\IterativeTPLDeCasteljau.cs" />
+    <Compile Include="strategy\abstract\RecursiveDeCasteljau.cs" />
+    <Compile Include="strategy\implementation\RecursiveSingleDeCasteljau.cs" />
     <Compile Include="utilities\ExtendedGraphics.cs" />
     <Compile Include="utilities\ExtendedPointF.cs" />
-    <Compile Include="strategy\IterativeParallelDeCasteljau.cs" />
-    <Compile Include="strategy\IterativeSingleDeCasteljau.cs" />
+    <Compile Include="strategy\implementation\IterativeParallelDeCasteljau.cs" />
+    <Compile Include="strategy\implementation\IterativeSingleDeCasteljau.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="strategy\RecursiveParallelDeCasteljau.cs" />
-    <Compile Include="utilities\Vector2.cs" />
+    <Compile Include="strategy\implementation\RecursiveParallelDeCasteljau.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

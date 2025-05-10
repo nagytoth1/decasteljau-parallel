@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 
 namespace GraphicsDLL
 {
-    public class IterativeParallelDeCasteljau : DeCasteljauStrategy
+    /// <summary>
+    /// Multi-threaded iterative DeCasteljau implementation using Parallel.For
+    /// </summary>
+    public class IterativeParallelDeCasteljau : IterativeDeCasteljau
     {
         public IterativeParallelDeCasteljau(PointF[] controlPoints, float increment) : base(controlPoints, increment) { }
 

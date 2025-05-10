@@ -1,10 +1,12 @@
-﻿using GraphicsDLL;
-using System;
+﻿using System;
 using System.Drawing;
 
 namespace GraphicsDLL
 {
-    public class IterativeSingleDeCasteljau : DeCasteljauStrategy
+    /// <summary>
+    /// Single-threaded iterative DeCasteljau implementation
+    /// </summary>
+    public class IterativeSingleDeCasteljau : IterativeDeCasteljau
     {
         public IterativeSingleDeCasteljau(PointF[] controlPoints, float increment) : base(controlPoints, increment) { }
 

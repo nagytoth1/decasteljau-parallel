@@ -3,7 +3,10 @@ using System.Drawing;
 
 namespace GraphicsDLL
 {
-    public class RecursiveSingleDeCasteljau : DeCasteljauStrategy
+    /// <summary>
+    /// Single-threaded iterative DeCasteljau implementation
+    /// </summary>
+    public class RecursiveSingleDeCasteljau : RecursiveDeCasteljau
     {
         public RecursiveSingleDeCasteljau(PointF[] controlPoints, float increment) : base(controlPoints, increment)
         {
@@ -23,20 +26,6 @@ namespace GraphicsDLL
             }
 
             return points;
-        }
-
-        private PointF[] DeCasteljauRecursive(PointF[] controlPoints, float t)
-        {
-            if (controlPoints.Length == 1) //base condition
-                return controlPoints;
-
-            PointF[] newPoints = new PointF[controlPoints.Length - 1];
-            int i;
-            for (i = 0; i < controlPoints.Length - 1; i++)
-            {
-                newPoints[i] = controlPoints[i].Interpolate(controlPoints[i + 1], t);
-            }
-            return DeCasteljauRecursive(newPoints, t);
         }
     }
 }

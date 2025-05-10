@@ -1,8 +1,16 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace GraphicsDLL
 {
+    /// <summary>
+    /// Abstract class that defines the DeCasteljau algorithm at a higher level for calculating Bezier curves.
+    /// 
+    /// This class provides a framework for different DeCasteljau implementations, allowing various strategies (e.g., sequential, parallel, TPL parallel execution) 
+    /// to be applied. It holds control points and increment values and offers an abstract, derived classes only need to override the `Iterate` method for the
+    /// specific iteration logic. It also includes methods for sequential interpolation of control points using the DeCasteljau algorithm.
+    /// </summary>
     public abstract class DeCasteljauStrategy
     {
         protected float increment;
@@ -32,33 +40,9 @@ namespace GraphicsDLL
         protected DeCasteljauStrategy(PointF[] controlPoints, float increment)
         {
             this.Increment = increment; 
-            this.controlPoints = controlPoints;
+            this.ControlPoints = controlPoints;
         }
 
         public abstract PointF[] Iterate();
-
-        protected PointF DecasteljauSequential(PointF[] controlPoints, float t)
-        {
-            PointF[] currentLevel = controlPoints;
-            for (int i = 0; i < controlPoints.Length - 1; i++)
-            {
-                currentLevel = InterpolateControlPointsSequential(currentLevel, t);
-            }
-
-            return currentLevel[0];
-        }
-
-        protected PointF[] InterpolateControlPointsSequential(PointF[] controlPoints, float t)
-        {
-            int numberOfControlPoints = controlPoints.Length - 1;
-            PointF[] interpolatedPoints = new PointF[numberOfControlPoints];
-            for (int i = 0; i < numberOfControlPoints; i++)
-            {
-                interpolatedPoints[i] = controlPoints[i].Interpolate(
-                    controlPoints[i + 1],
-                    t);
-            }
-            return interpolatedPoints;
-        }
     }
 }

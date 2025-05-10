@@ -8,8 +8,9 @@ namespace GraphicsDLL
     {
         RECURSIVE_MULTITHREADED,
         ITERATIVE_MULTITHREADED,
+        ITERATIVE_TPL_MULTITHREADED,
         ITERATIVE_SINGLE_THREADED,
-        RECURSIVE_SINGLE_THREADED
+        RECURSIVE_SINGLE_THREADED,
     }
     public static class DeCasteljauFactory
     {
@@ -19,6 +20,7 @@ namespace GraphicsDLL
             {  DeCasteljauStrategies.ITERATIVE_MULTITHREADED, (controlPoints, increment) => new IterativeParallelDeCasteljau(controlPoints, increment)},
             {  DeCasteljauStrategies.RECURSIVE_SINGLE_THREADED, (controlPoints, increment) => new RecursiveSingleDeCasteljau(controlPoints, increment)},
             {  DeCasteljauStrategies.RECURSIVE_MULTITHREADED, (controlPoints, increment) => new RecursiveParallelDeCasteljau(controlPoints, increment)},
+            {  DeCasteljauStrategies.ITERATIVE_TPL_MULTITHREADED, (controlPoints, increment) => new IterativeTPLDecasteljau(controlPoints, increment)}
         };
         public static DeCasteljauStrategy Create(PointF[] controlPoints, float increment, DeCasteljauStrategies strategy)
         {
