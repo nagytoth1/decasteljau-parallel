@@ -17,7 +17,6 @@ namespace GraphicsDLL
             int numberOfSteps = (int)Math.Round(1f / increment) + 1;
             List<Task<PointF>> tasks = new List<Task<PointF>>();
 
-            // todo: why endless recursion?
             for (int i = 0; i < numberOfSteps; ++i)
             {
                 float t = i * increment;

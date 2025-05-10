@@ -95,7 +95,7 @@ namespace DeCasteljauForm
                 return;
             }
             DeCasteljauStrategies selectedStrategy = (DeCasteljauStrategies)Enum.Parse(typeof(DeCasteljauStrategies), cbDecasteljau.SelectedItem.ToString(), false);
-            DeCasteljauStrategy selectedImplementation = DeCasteljauFactory.Create(controlPoints, 0.01f, selectedStrategy);
+            DeCasteljauStrategy selectedImplementation = DeCasteljauFactory.Create(controlPoints, 0.001f, selectedStrategy);
             Stopwatch stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
             PointF[] curvePoints = selectedImplementation.Iterate();

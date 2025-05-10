@@ -9,7 +9,7 @@ namespace CLI
     {
         static void Main(string[] args)
         {
-            PointF[] controlPoints = FillControlPointsArray(100);
+            PointF[] controlPoints = FillControlPointsArray(200);
             const float increment = 0.001f;
 
             DeCasteljauStrategy selectedStrategy = new IterativeSingleDeCasteljau(controlPoints, increment);
