@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
@@ -14,20 +15,17 @@ namespace GraphicsDLL
 
         public override PointF[] Iterate()
         {
-            int numberOfSteps = (int)Math.Round(1f / increment) + 1;
-            PointF[] points = new PointF[numberOfSteps];
-            int chunkSize = 5;
-            int numberOfChunks = (numberOfSteps + chunkSize - 1) / chunkSize;
+            int numberOfIterations = (int)Math.Round(1f / increment); // e.g. 1 / 0.001 => 1000
+            int numberOfChunks = Environment.ProcessorCount * 2;
+            int chunkSize = (numberOfIterations + numberOfChunks - 1) / numberOfChunks; // dynamically calculated chunk size
+            PointF[] points = new PointF[numberOfIterations];
 
-
-            Parallel.For(0, numberOfChunks, chunkIndex =>
-            {
-                int start = chunkIndex * chunkSize;
-                int end = Math.Min(start + chunkSize, numberOfSteps);
+            Parallel.For(0, numberOfChunks + 1, (index) => {
+                int start = index * chunkSize;
+                int end = Math.Min(start + chunkSize, numberOfIterations);
                 for (int i = start; i < end; ++i)
                 {
-                    float t = i * increment;
-                    points[i] = DecasteljauSequential(controlPoints, t);
+                    points[i] = DecasteljauSequential(controlPoints, i * increment);
                 }
             });
 

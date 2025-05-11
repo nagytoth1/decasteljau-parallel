@@ -14,23 +14,40 @@ namespace GraphicsDLL
 
         public override PointF[] Iterate()
         {
-            int numberOfSteps = (int)Math.Round(1f / increment) + 1;
-            List<Task<PointF>> tasks = new List<Task<PointF>>();
+            int numberOfIterations = (int)Math.Round(1f / increment); // e.g. 1 / 0.001 => 1000
+            int numberOfChunks = Environment.ProcessorCount * 2;
+            int chunkSize = (numberOfIterations + numberOfChunks - 1) / numberOfChunks; // dynamically calculated chunk size
+            List<Task<PointF[]>> tasks = new List<Task<PointF[]>>();
 
-            for (int i = 0; i < numberOfSteps; ++i)
+            for (int chunkIndex = 0; chunkIndex < numberOfChunks; ++chunkIndex)
             {
-                float t = i * increment;
-                Task<PointF> task = Task.Run(() =>
+                int start = chunkIndex * chunkSize;
+                int end = Math.Min(start + chunkSize, numberOfIterations);
+                Task<PointF[]> task = Task.Run(() =>
                 {
-                    return DeCasteljauRecursive(
-                    controlPoints,
-                    t)[0]; // base condition --> will always return 1 controlPoint
+                    PointF[] localResults = new PointF[end - start];
+                    for (int i = start; i < end; ++i)
+                    {
+                        localResults[i - start] = DeCasteljauRecursive(controlPoints, i * increment)[0];
+                    }
+                    return localResults;
                 });
                 tasks.Add(task);
             }
 
+            // merge all results into this array
+            PointF[] globalResults = new PointF[numberOfIterations];
+            int k = 0;
+            for (int i = 0; i < numberOfChunks; i++)
+            {
+                PointF[] taskResults = tasks[i].Result; // we could block here, right?
+                foreach (var resultPoint in taskResults)
+                {
+                    globalResults[k++] = resultPoint;
+                }
+            }
             // block until all tasks are completed to collect results
-            return Task.WhenAll(tasks.ToArray()).Result;
+            return globalResults;
         }
     }
 }

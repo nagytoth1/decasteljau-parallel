@@ -14,16 +14,14 @@ namespace GraphicsDLL
 
         public override PointF[] Iterate()
         {
-            const int CHUNK_SIZE = 5;
-            int numberOfSteps = (int) Math.Round(1f / increment) + 1;
-            int numberOfChunks = (numberOfSteps + CHUNK_SIZE - 1) / CHUNK_SIZE;
+            int numberOfIterations = (int)Math.Round(1f / increment); // e.g. 1 / 0.001 => 1000
+            int numberOfChunks = Environment.ProcessorCount * 2;
+            int chunkSize = (numberOfIterations + numberOfChunks - 1) / numberOfChunks; // dynamically calculated chunk size
             List<Task<PointF>> tasks = new List<Task<PointF>>();
-
-            for (int chunkIndex = 0; chunkIndex < numberOfChunks; chunkIndex++)
+            for (int chunkIndex = 0; chunkIndex < numberOfChunks; ++chunkIndex)
             {
-
-                int start = chunkIndex * CHUNK_SIZE;
-                int end = Math.Min(start + CHUNK_SIZE, numberOfSteps);
+                int start = chunkIndex * chunkSize;
+                int end = Math.Min(start + chunkSize, numberOfIterations);
                 for (int i = start; i < end; ++i)
                 {
                     float t = i * increment;

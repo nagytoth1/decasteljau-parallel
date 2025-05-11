@@ -12,6 +12,15 @@ namespace CLI
             PointF[] controlPoints = FillControlPointsArray(200);
             const float increment = 0.001f;
 
+            CompareExecutions(controlPoints, increment);
+            //DeCasteljauStrategy selectedStrategy = new RecursiveParallelDeCasteljau(controlPoints, increment);
+            //double sequentialTimeMs = MeasureExecutionTime(() => selectedStrategy.Iterate());
+
+            Console.ReadKey();
+        }
+
+        private static void CompareExecutions(PointF[] controlPoints, float increment)
+        {
             DeCasteljauStrategy selectedStrategy = new IterativeSingleDeCasteljau(controlPoints, increment);
             double sequentialTimeMs = MeasureExecutionTime(() => selectedStrategy.Iterate());
 
@@ -26,6 +35,7 @@ namespace CLI
 
 
             Console.WriteLine("DeCasteljau Execution Times (ms) - Average of 10 consequent executions:");
+            Console.WriteLine("Number of controlPoints: {0}, increment = {1}", controlPoints.Length, increment);
             Console.WriteLine("--------------------------------------------------------");
             Console.WriteLine("{0,-35} {1,10}", "Strategy", "Execution Time (ms)");
             Console.WriteLine("--------------------------------------------------------");
@@ -38,8 +48,6 @@ namespace CLI
             Console.WriteLine("Speedup with Parallel.For: {0:0.00}", sequentialTimeMs / parallelTimeMs1);
             Console.WriteLine("Speedup with TPL: {0:0.00}", sequentialTimeMs / parallelTimeMs2);
             Console.WriteLine("Speedup with Recursive + TPL: {0:0.00}", sequentialTimeMs / parallelTimeMs3);
-
-            Console.ReadKey();
         }
 
         static double MeasureExecutionTime(Func<PointF[]> method)

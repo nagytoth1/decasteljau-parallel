@@ -4,7 +4,13 @@
 
 ## A DeCasteljau algoritmus párhuzamosítása
 
-<!-- DeCasteljau algoritmusról írni -->
+A DeCasteljau-algoritmus a Bézier-görbék egyik legfontosabb numerikus számítási módszere, amelyet széles körben használnak a számítógépes grafikában és a számítógépes modellezésben. Ez az eljárás képes egy Bézier-görbe adott t paraméter szerinti pontját kiszámítani az iteratív kontrollpontok interpolálásával.
+
+Az algoritmus a kontrollpontok között lineáris interpolációt végez. Ezáltal elkerülhetjük azokat a problémákat, amelyek a klasszikus polinomiális számítások során előfordulhatnak.
+
+A DeCasteljau-algoritmus és a Bernstein-polinomok matematikailag azonos görbét írnak le, eltérő megközelítéssel. A DeCasteljau-algoritmus egy interpolációs eljárás, amely a kontrollpontok között lineáris interpolációt végez. Minden lépésben a kontrollpontok közötti interpoláció eredményeként csökken a bemenő pontok száma, amíg végül egyetlen pontot nem kapunk, amely a kívánt t paraméter szerinti pontot adja meg nekünk a görbén. Ezzel szemben a Bernstein-polinomok egy algebrai módszert alkalmaznak, ahol a görbét egy explicit polinomiális kifejezés segítségével definiálják.
+
+A Bézier-görbéknél a kontrollpontok kulcsfontosságú szerepet játszanak, hiszen ezek határozzák meg a görbe alakját és geometriáját. Fontos megjegyezni, hogy a kontrollpontok nem feltétlenül esnek a görbére, hanem azok irányítják azt, mintha egy láthatatlan erő húzná őket a görbe irányába.
 
 A DeCasteljau algoritmus különböző megvalósításait C# nyelven írtam meg, egy DLL-állomány készült ezekből, amelynek metódusait egy Windows Forms-os grafikus felületen, illetve egy konzolos alkalmazásból használtam. Féléves feladatom forráskódja [ezen a Github linken](https://github.com/nagytoth1/decasteljau-parallel.git) keresztül elérhető.
 
@@ -36,21 +42,45 @@ Volt egy olyan pont a fejlesztés során, amikor szükségessé vált a DeCastel
 
 ### Párhuzamosítási módszerek
 
-Párhuzamosítási ötlet: Különböző t-értékekkel biztosítjuk, hogy a görbe teljes alakját kirajzoljuk, a különböző t-paraméterekkel végzett DeCasteljau számítások nem ütköznek egymásba, ezek egymástól függetlenek.
+Párhuzamosítási ötlet: Egy-egy adott t-értékekkel meghívott DeCasteljau-függvénnyel egy-egy pontot kapunk meg a görbén. Ha a t értékeit 0-tól 1-ig bejárjuk, 10, 100 vagy 1000 lépésben, egyre finomabb felbontású görbét kapunk. Mivel ezek a lefutások függetlenek egymástól, ideálisak párhuzamos végrehajtásra.
+
+A rajzolási műveletek párhuzamosítása elkerülhető azzal, hogy azokat a párhuzamosított résztől elkülönítjük, így a párhuzamos szálak feladata csak a görbe egyes pontjainak kiszámítására redukálódik, ezért egy `lock(g)` zárolás megspórolható. A rajzolási műveleteket a görbe kiszámított pontokra utólag, szekvenciálisan végezzük.
 
 <!-- todo: befejezni -->
 
-1. IterativeParallelDeCasteljau
-2. IterativeTPLDeCasteljau
-3. RecursiveParallelDeCasteljau: Task Parallel Library
+1. **IterativeParallelDeCasteljau**
 
-- Task.Run() segítségével minden egyes új t értékre új szálat indítottam, az ily módon létrehozott Task objektumokat listába gyűjtöttem.
-- A futtatott Task objektumok eredményeit bevárom, majd a függvény végén visszatérek az eredményekkel. Az eredmény egy görbe pontjait tartalmazó tömb, amelyet a Graphics osztály segítségével Formon meg is tudunk jeleníteni.
-- A rajzolási műveleteket elkerültem azzal, hogy azokat a párhuzamosítás során kiszedtem, így a párhuzamos szálak feladata csak a görbe egyes pontjainak kiszámítására redukálódott, így egy `lock(g)` zárolást megspóroltam. A rajzolást utólag, szekvenciálisan, a kiszámított pontok ismeretében végezzük.
+- A párhuzamos végrehajtás a Parallel.For ciklus használatával történik, amely lehetővé teszi, hogy több szálon dolgozzunk az egyes t-értékek kiszámításán. Mivel az egyes iterációk függetlenek egymástól, így könnyen párhuzamosíthatók.
+
+- Az algoritmus a tömböt kisebb szeletekre osztja. Jelenleg dinamikusan ProcessorCount \* 2 résztömbbel számol, így a résztömbök mérete az iterációk számától függ, tehát például ha 100 iterációs lépésre van szükség, és a processzormagok száma 2, akkor 4-felé bontva 25-ös méretű tömbök jönnek létre.
+
+- Ez a módszer javítja a párhuzamos végrehajtás hatékonyságát, mivel minden szál egy-egy darabra koncentrál, és biztosítja, hogy nem aprózódnak el túlságosan a feladatok (korábban konstans 5-re volt állítva a résztömbök mérete).
+
+2. **IterativeTPLDeCasteljau**
+
+- iteratív DeCasteljau algoritmust párhuzamosít Task Parallel Library segítségével
+- Task.Run() segítségével minden aktuális résztömbre új Taskot indítottam, az ily módon létrehozott Task objektumokat listába gyűjtöttem.
+
+- A futtatott Task objektumok eredményeit bevárom, majd a függvény végén visszatérek az eredményekkel.
+
+3. **RecursiveParallelDeCasteljau**
+
+- rekurzív DeCasteljau algoritmust párhuzamosít Task Parallel Library segítségével
+- Task.Run() segítségével minden aktuális résztömbre új Taskot indítottam, az ily módon létrehozott Task objektumokat listába gyűjtöttem.
+- A futtatott Task objektumok eredményeit bevárom, majd a függvény végén visszatérek az eredményekkel.
+
+A Task Parallel Library (TPL) használata előnyösebb volt a párhuzamosítási megoldásban, mint a szálak kezelését egyesével végezni, mivel a TPL a ThreadPool-t is képes kihasználni. Ez jelentősen csökkenti a szálkezeléssel kapcsolatos overheadet és javítja a rendszer erőforrásainak kihasználását. A TPL automatikusan kezeli a szálakat, és biztosítja, hogy a rendszer optimálisan oszthassa el a feladatokat, így a párhuzamosítás hatékonyabbá válik, különösen nagy számú iterációk vagy kontrollpontok esetén.
+
+Az eredmény mindhárom párhuzamosított módszer esetében megegyezik: egy görbe pontjait tartalmazó tömböt kapunk, amely tömböt a Graphics osztály segítségével Formon meg is tudunk jeleníteni.
 
 ## Elkészült Windows Forms grafikus felület
 
-Grafikus felületet készítettem arra, hogy különböző DeCasteljau végrehajtási módszereket vizuálisan is láthassuk, hogy megegyeznek, ugyanazon kontrollpontokra végezzük.
+Windows Formsban grafikus felületet készítettem, hogy könnyebben vizualizálhassuk a különböző DeCasteljau végrehajtási módszereket. A felületen egy ComboBox segítségével választhatjuk ki a kívánt módszert (pl. iteratív, párhuzamos, rekurzív), és az Execute gomb megnyomásával a kiválasztott algoritmus futtatásra kerül ugyanazon bemeneti kontrollpontokon. Két kontrollpont tömböt definiáltam: az egyik a szinuszgörbét reprezentál, míg a másik az előző tükörképét, amely az y-tengelyen még el lett tolva a hullám magasságával (amplitúdójával).
+
+A grafikus felület lehetővé teszi a felhasználó számára, hogy összehasonlítsák a különböző módszerek teljesítményét és eredményeit.
+
+Ez a megoldás különösen hasznos lehet azok számára, akik szeretnék megérteni a DeCasteljau algoritmus működését és hatékonyságát, miközben vizuálisan is érzékeltetjük az egyes végrehajtási módok közötti időbeli különbségeket.
+
 ![decasteljau-windowsforms-app](image.png)
 
 ## Párhuzamosítási módszerek összehasonlítása
@@ -61,29 +91,36 @@ Tesztjeim során 10 egymást követő futtatás átlagos futási idejét mértem
 
 ```bash
 DeCasteljau Execution Times (ms) - Average of 10 consequent executions:
+Number of controlPoints: 200, increment = 0,001
 --------------------------------------------------------
 Strategy                            Execution Time (ms)
 --------------------------------------------------------
-Iterative Single DeCasteljau          167,1548
-Iterative Parallel DeCasteljau         40,2980
-Iterative TPL DeCasteljau              40,4137
-Recursive Parallel DeCasteljau         52,8786
+Iterative Single DeCasteljau          158,4101
+Iterative Parallel DeCasteljau         39,2081
+Iterative TPL DeCasteljau              40,0885
+Recursive Parallel DeCasteljau         45,0664
 --------------------------------------------------------
-Speedup with Parallel.For: 4,15
-Speedup with TPL: 4,14
-Speedup with Recursive + TPL: 3,16
+Speedup with Parallel.For: 4,04
+Speedup with TPL: 3,95
+Speedup with Recursive + TPL: 3,52
 ```
 
 A különböző végrehajtási módok 200 kontrollponttal lettek tesztelve, és a t paraméter lépésköze 0.001 volt (ez 1000 DeCasteljau-iterációt jelent, grafikusan finomabb felbontású görbéket eredményezve), hogy biztosítsunk mérhető nagyságrendű számítási feladatot, miközben a párhuzamosítási stratégiák hatását pontosabban mérhetjük (ezen a szinten a szálkezelés overheadjei elhanyagolhatóak).
 
 A következő eredmények születtek a különböző párhuzamosítási technikák alkalmazása során:
 
-- Parallel.For alkalmazása esetén a teljesítmény 4,16-szoros növekedést mutatott a szekvenciális verzióhoz képest.
+- Parallel.For alkalmazása esetén a teljesítmény 4.04-szeresére növekedett a szekvenciális futáshoz képest ebben a tesztben.
 
-- TPL (_Task Parallel Library_) alkalmazása 4,25-szörös gyorsulást eredményezett, ami azt jelenti, hogy a TPL képes jobb párhuzamos végrehajtást biztosítani, mint a Parallel.For, különösen a dinamikus feladatkezelés és a finomabb vezérlés miatt.
+- TPL (_Task Parallel Library_) alkalmazása 3.95-szörös gyorsulást eredményezett, ami azt jelenti, hogy a TPL képes jobb párhuzamos végrehajtást biztosítani, mint a Parallel.For, különösen a dinamikus feladatkezelés és a finomabb vezérlés miatt. Volt olyan futás, amikor a TPL megelőzte az előző Parallel.For módszert is.
 
-- A rekurzív párhuzamosítási módszer, bár hasznos, csupán 3,63-szoros gyorsulást eredményezett, ami arra utal, hogy a rekurzív hívások overheadje jelentősen csökkenti a párhuzamosítás hatékonyságát.
+- A rekurzív DeCasteljau párhuzamosítása TPL-lel csupán 3.52-szeres gyorsulást eredményezett, ami arra utal, hogy a rekurzív hívások overheadje csökkenti a párhuzamosítás hatékonyságát.
 
 ### Összegzés:
 
-Összességében a Parallel.For és a TPL módszerek biztosították a legnagyobb gyorsulást, és bár mindkét megoldás jól teljesített, a TPL jobb finomhangolást és rugalmasságot kínál, míg a Parallel.For egyszerűbb implementációval és az optimális szálkezelésével előnyösebb választásnak tűnt. A rekurzív DeCasteljau párhuzamosított változata, bár szintén hozott jelentős javulást a szekvenciális futtatáshoz képest, csupán 3,63-szoros gyorsulást eredményezett, amely elmarad a többi módszertől.
+Összességében a Parallel.For és a TPL módszerek biztosították a legnagyobb gyorsulást, és bár mindkét megoldás jól teljesített, a TPL jobb finomhangolást és rugalmasságot kínál, míg a Parallel.For egyszerűbb implementációval és az optimális szálkezelésével előnyösebb választásnak tűnt. A rekurzív DeCasteljau párhuzamosított változata, bár szintén jelentős javulást jelent a szekvenciális futtatáshoz képest, de elmarad a többi módszer hatékonyságától.
+
+Ha a DeCasteljau algoritmus viszonylag kevés kontrollponttal dolgozik, a párhuzamosítás nem jár jelentős teljesítménybeli haszonnal, ilyenkor a szálkezelés overheadje még túl nagy. Ellenben ha olyan helyzetekről van szó, ahol sok kontrollpontot kell folyamatosan módosítani vagy újraszámolni (mint a grafikus szerkesztőalkalmazásokban), akkor mindenképpen előnyös a párhuzamosítás.
+
+Szerkesztőprogramokban, ahol a felhasználó folyamatosan módosítja a görbéket, a DeCasteljau algoritmus minden egyes módosításkor újra végrehajtódik. Ilyenkor a párhuzamosítás segíthet abban, hogy a nagy számú kontrollpontot gyorsabban dolgozhassák fel, különösen komplex görbék vagy magasabb dimenziójú felületek esetén.
+
+Ezért érdemes a közeljövőben alkalmazáslogikát építeni arra, hogy dinamikusan válasszuk ki, mikor hívjuk meg a párhuzamosított DeCasteljau algoritmust, figyelembe véve a kontrollpontok számát és a görbe finomításának mértékét. Egy olyan határértéket érdemes meghatározni, amely felett (például amikor legalább még nem ront a végrehajtási időn, 1-szeres sebességnövekedés esetén) már indokolt a párhuzamosítás alkalmazása, az alatt még a szekvenciális módszert választjuk.
